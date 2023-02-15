@@ -1,45 +1,70 @@
 <template>
-  <div class="home-main" v-if="finish">
+  <div class="app-main" v-loading="finish">
     <HomeHeader></HomeHeader>
-    <div>
-      <el-button v-for="item in routes" :key="item.name" @click="handleClick(item.path)">{{ item.name }}</el-button>
-    </div>
+    <div id="cesiumContainer"></div>
+    <HomeMenu></HomeMenu>
     <RouterView />
   </div>
-
 </template>
 <script setup lang='ts'>
 // 方法引入
-import { reactive, ref, onBeforeMount, onMounted } from 'vue'
-import { computed } from "@vue/reactivity";
+import { reactive, ref, onBeforeMount, onMounted, nextTick } from 'vue'
 import { getLocalStorage } from '@/utils/localstorage'
 import router from '@/router';
 // 组件引入
 import HomeHeader from './home/HomeHeader.vue';
-// 接口引入
-import { GetDynamicRoutes } from "@/api/home"
-// 状态管理器引入
-import { useHomeStore } from "@/store/modules/home";
-
-const homeStore = useHomeStore()
-onBeforeMount(() => {
+import HomeMenu from './home/HomeMenu.vue';
+onMounted(() => {
   if (!getLocalStorage("LH_TOKEN")) {
     router.push("/login")
   } else {
-    alert("登陆成功")
-    GetDynamicRoutes().then(res => {
-      homeStore.updateRoutes(res.data, router)
+    nextTick(() => {
+      initViewer()
     })
-    finish.value = true
   }
 })
-const routes = computed(() => homeStore.routes)
-// 路由按钮点击事件
-const handleClick = (path: string) => {
-  router.push(path)
+const finish = ref(true)
+const initViewer = () => {
+  const Cesium = window.Cesium
+  let key =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiYjUwNWQyOC0yZmZhLTRmMzItOTQyZC02ZmQyMWIyMTA3NmEiLCJpZCI6NjcyNzcsImlhdCI6MTY2ODE1ODc2Mn0.t1h6-ZADkGnZUZZoLtrlgtTp8_MR2Kxfhew42ksDgmk";
+  Cesium.Ion.defaultAccessToken = key;
+  let viewer = window.Viewer = new Cesium.Viewer("cesiumContainer", {
+    imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
+      url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+    }),
+    terrainProvider: Cesium.createWorldTerrain(),
+    geocoder: false,
+    homeButton: false,
+    sceneModePicker: false,
+    baseLayerPicker: false,
+    navigationHelpButton: false,
+    animation: false,
+    timeline: false,
+    fullscreenButton: false,
+    vrButton: false,
+    //关闭点选出现的提示框
+    selectionIndicator: false,
+    infoBox: false,
+  });
+  viewer.scene.debugShowFramesPerSecond = true;//开启帧率
+  viewer.scene.globe.depthTestAgainstTerrain = true;//开启深度检测
+  viewer._cesiumWidget._creditContainer.style.display = "none"; // 隐藏版权
+  finish.value = false
 }
-let finish = ref(false)
 </script>
 <style lang="scss" scoped>
-.home-main {}
+.app-main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  #cesiumContainer {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 90px);
+  }
+}
 </style>

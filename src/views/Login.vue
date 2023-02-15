@@ -73,7 +73,6 @@ const rules = reactive({
 })
 
 const submitForm = (formEl: FormInstance | undefined) => {
-  console.log("测试去除console")
   if (!formEl) return
   formEl.validate((valid) => {
     if (valid) {

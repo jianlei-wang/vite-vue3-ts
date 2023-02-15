@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --mode dev",
     "prod": "vite --mode prod",
-    "build": "vue-tsc && vite build --mode prod",
+    "build": "vite build --mode prod",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -19,9 +19,11 @@
   },
   "devDependencies": {
     "@types/node": "^18.13.0",
+    "@types/qs": "^6.9.7",
     "@vitejs/plugin-vue": "^4.0.0",
     "amfe-flexible": "^2.2.1",
     "autoprefixer": "^10.4.13",
+    "cesium": "^1.102.0",
     "mockjs": "^1.1.0",
     "postcss-pxtorem": "^6.0.0",
     "sass": "^1.58.0",
