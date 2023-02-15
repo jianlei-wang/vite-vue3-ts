@@ -1,27 +1,30 @@
-import { defineStore } from 'pinia'
-import { storeHome } from '../types/home'
+import { defineStore } from 'pinia';
+import { storeHome } from '../types/home';
+
+let modules = import.meta.glob('../../views/modules/*.vue');
 
 export const useHomeStore = defineStore('index', {
-    state: (): storeHome => {
-        return {
-            count: 0,
-            status: false
-        }
+  state: (): storeHome => {
+    return {
+      //路由表
+      routes: [],
+    };
+  },
+  getters: {},
+  actions: {
+    updateRoutes(data: Array<any>, router: any) {
+      this.routes = [];
+      data.forEach((el) => {
+        this.routes.push({
+          path: el.path,
+          name: el.name,
+          component: modules[`../../views/modules/${el.component}`],
+        });
+      });
+      this.routes.forEach((el) => {
+        router.addRoute('Home', el);
+        // router.addRoute();
+      });
     },
-    getters: {
-        curCount(): number {
-            return this.count * 3
-        },
-        curStatus(): boolean {
-            return this.status
-        }
-    },
-    actions: {
-        updatecount(val: number) {
-            this.count = val
-        },
-        changeStatus(val: boolean) {
-            this.status = val
-        }
-    }
-})
+  },
+});

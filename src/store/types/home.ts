@@ -1,4 +1,5 @@
+import { RouteRecordRaw } from 'vue-router';
+
 export type storeHome = {
-    count: number,
-    status: boolean
-}
+  routes: Array<RouteRecordRaw>;
+};

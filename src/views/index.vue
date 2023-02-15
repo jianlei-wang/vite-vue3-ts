@@ -1,77 +1,45 @@
 <template>
-  <div class="main-box">
+  <div class="home-main" v-if="finish">
+    <HomeHeader></HomeHeader>
     <div>
-      <h1>状态管理测试界面</h1>
-      <h1>状态count：{{ count }}</h1>
-      <h1>状态curCount：{{ calculateCount }}</h1>
-      <button @click="initCount">归零</button>
-      <button @click="changeCount">随机</button>
+      <el-button v-for="item in routes" :key="item.name" @click="handleClick(item.path)">{{ item.name }}</el-button>
     </div>
-    <div>
-      <el-button @click="showMessage" size="small">显示弹窗</el-button>
-    </div>
-    <div>
-      <h1>mock接口测试</h1>
-      <el-button size="small" @click="mockTest">testApi</el-button>
-    </div>
-    <div>
-      <h1>SVG 图标使用</h1>
-      <svg-icon name="user" width="64" height="64"></svg-icon>
-      <svg-icon name="login-pwd" width="48" height="48" color="#ffff00"></svg-icon>
-    </div>
+    <RouterView />
   </div>
+
 </template>
-<script lang="ts">
-import { defineComponent, ref, computed } from 'vue';
+<script setup lang='ts'>
+// 方法引入
+import { reactive, ref, onBeforeMount, onMounted } from 'vue'
+import { computed } from "@vue/reactivity";
+import { getLocalStorage } from '@/utils/localstorage'
+import router from '@/router';
+// 组件引入
+import HomeHeader from './home/HomeHeader.vue';
+// 接口引入
+import { GetDynamicRoutes } from "@/api/home"
+// 状态管理器引入
 import { useHomeStore } from "@/store/modules/home";
-import { testApi } from "@/api/index";
-export default defineComponent({
-  name: "Home",
-  setup() {
-    const homeStore = useHomeStore()
-    let count = computed(() => homeStore.count)
-    let calculateCount = computed({
-      get(): number {
-        return homeStore.curCount
-      },
-      set(val: number): void {
-        homeStore.updatecount(val)
-      }
+
+const homeStore = useHomeStore()
+onBeforeMount(() => {
+  if (!getLocalStorage("LH_TOKEN")) {
+    router.push("/login")
+  } else {
+    alert("登陆成功")
+    GetDynamicRoutes().then(res => {
+      homeStore.updateRoutes(res.data, router)
     })
-    const initCount = () => {
-      calculateCount.value = 0
-    }
-    const changeCount = () => {
-      const num = Math.random() * 100
-      calculateCount.value = Math.floor(num)
-    }
-    const showMessage = () => {
-      ElMessage({
-        showClose: true,
-        message: "登录注册成功",
-        type: "success",
-      });
-    }
-    const mockTest = () => {
-      testApi().then((datas) => {
-        console.log(datas)
-      })
-    }
-    return { count, calculateCount, initCount, changeCount, showMessage, mockTest }
+    finish.value = true
   }
 })
-</script>
-<style lang="scss">
-.main-box {
-  width: 650px;
-  background: rgb(170, 170, 161);
-  padding: 25px;
-  margin: 0 auto;
-  font-size: 20px;
-
-  h1 {
-    color: red;
-    font-weight: bold;
-  }
+const routes = computed(() => homeStore.routes)
+// 路由按钮点击事件
+const handleClick = (path: string) => {
+  router.push(path)
 }
+let finish = ref(false)
+</script>
+<style lang="scss" scoped>
+.home-main {}
 </style>
