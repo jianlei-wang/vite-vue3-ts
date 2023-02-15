@@ -1,6 +1,6 @@
 import { GetDynamicRoutes } from '@/api/home';
 import { useHomeStore } from '@/store/modules/home';
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 // import Home from '@/views/index.vue'
 const routes: Array<RouteRecordRaw> = [
   {
@@ -20,19 +20,22 @@ const routes: Array<RouteRecordRaw> = [
   },
 ];
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
 });
 
 // 路由守卫
 router.beforeEach((to, from, next) => {
-  if (to.path !== '/main' && to.path !== '/') {
+  const path = to.path;
+  if (['/main', '/', '/login'].indexOf(path) != -1) {
+    next();
+  } else {
     const store = useHomeStore();
     if (store.routes.length < 1) {
       GetDynamicRoutes()
         .then((res) => {
           store.updateRoutes(res.data, router);
-          next({ path: to.path, replace: true });
+          next({ path: path, replace: true });
         })
         .catch((_) => {
           next();
@@ -40,8 +43,6 @@ router.beforeEach((to, from, next) => {
     } else {
       next();
     }
-  } else {
-    next();
   }
 });
 export default router;
