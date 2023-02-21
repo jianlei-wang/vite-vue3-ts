@@ -7,13 +7,17 @@ export {}
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
-    ElButton: typeof import('element-plus/es')['ElButton']
+    copy: typeof import('./src/components/popup/StationPopup copy.vue')['default']
     ElForm: typeof import('element-plus/es')['ElForm']
     ElFormItem: typeof import('element-plus/es')['ElFormItem']
     ElInput: typeof import('element-plus/es')['ElInput']
+    MapLegend: typeof import('./src/components/MapLegend.vue')['default']
+    PopupForm: typeof import('./src/components/PopupForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    StationPopup: typeof import('./src/components/popup/StationPopup.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon.vue')['default']
+    VideoPopup: typeof import('./src/components/popup/VideoPopup.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

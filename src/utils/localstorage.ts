@@ -5,7 +5,7 @@ export const setLocalStorage = (key: string, value?: string, hours?: number) => 
     if (!value) {
         localStorage.removeItem(key)
     } else {
-        let Hours = hours || 24; // 以小时为单位，默认24小时
+        let Hours = hours || 3; // 以小时为单位，默认24小时
         let exp = new Date();
         localStorage[key] = JSON.stringify({
             value,

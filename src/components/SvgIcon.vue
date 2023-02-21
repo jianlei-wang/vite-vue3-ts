@@ -29,7 +29,7 @@ export default defineComponent({
     height: {
       type: String,
       default: '32'
-    }
+    },
   },
   setup(props) {
     const symbolId = computed(() => `#${props.prefix}-${props.name}`);

@@ -3,14 +3,17 @@
     <HomeHeader></HomeHeader>
     <div id="cesiumContainer"></div>
     <HomeMenu></HomeMenu>
+    <PopupForm v-if="showPop" :item="popItem"></PopupForm>
     <RouterView />
   </div>
 </template>
 <script setup lang='ts'>
 // 方法引入
-import { reactive, ref, onBeforeMount, onMounted, nextTick } from 'vue'
+import { reactive, ref, onBeforeMount, onMounted, nextTick, computed } from 'vue'
 import { getLocalStorage } from '@/utils/localstorage'
 import router from '@/router';
+import { initMap } from "@/utils/map-layers";
+import { useMapStore } from '@/store/modules/map';
 // 组件引入
 import HomeHeader from './home/HomeHeader.vue';
 import HomeMenu from './home/HomeMenu.vue';
@@ -23,7 +26,10 @@ onMounted(() => {
     })
   }
 })
-const finish = ref(true)
+const mapStore = useMapStore()
+let showPop = computed(() => mapStore.showMapPop)
+let popItem = computed(() => mapStore.mapSelectFeature || {})
+let finish = ref(true)
 const initViewer = () => {
   const Cesium = window.Cesium
   let key =
@@ -33,7 +39,9 @@ const initViewer = () => {
     imageryProvider: new Cesium.ArcGisMapServerImageryProvider({
       url: "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
     }),
-    terrainProvider: Cesium.createWorldTerrain(),
+    terrainProvider: new Cesium.CesiumTerrainProvider({
+      url: 'https://www.larkview.cn/tileserver/api/terrain/china_dem_30/'
+    }),
     geocoder: false,
     homeButton: false,
     sceneModePicker: false,
@@ -46,11 +54,15 @@ const initViewer = () => {
     //关闭点选出现的提示框
     selectionIndicator: false,
     infoBox: false,
+    // requestWebgl2: true
   });
   viewer.scene.debugShowFramesPerSecond = true;//开启帧率
-  viewer.scene.globe.depthTestAgainstTerrain = true;//开启深度检测
+  // viewer.scene.globe.depthTestAgainstTerrain = true;//开启深度检测
   viewer._cesiumWidget._creditContainer.style.display = "none"; // 隐藏版权
-  finish.value = false
+  initMap(() => {
+    finish.value = false
+  })
+
 }
 </script>
 <style lang="scss" scoped>
@@ -64,7 +76,7 @@ const initViewer = () => {
   #cesiumContainer {
     position: relative;
     width: 100%;
-    height: calc(100% - 90px);
+    height: calc(100% - 70px);
   }
 }
 </style>

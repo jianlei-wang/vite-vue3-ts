@@ -67,6 +67,8 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       assetsDir: 'static', //指定静态资源存放路径
       sourcemap: false, //是否构建source map 文件
+      chunkSizeWarningLimit: 1000, //限制块文件大小
+      minify: 'terser',
       terserOptions: {
         // 生产环境移除console
         compress: {
@@ -91,6 +93,16 @@ export default defineConfig(({ mode }) => {
           },
           chunkFileNames: 'static/js/[name]-[hash].js',
           entryFileNames: 'static/js/[name]-[hash].js',
+          //分解块，将大块分解成更小的块
+          // manualChunks: (id) => {
+          //   if (id.includes('node_modules')) {
+          //     return id
+          //       .toString()
+          //       .split('node_modules/')[1]
+          //       .split('/')[0]
+          //       .toString();
+          //   }
+          // },
         },
       },
     },
